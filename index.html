@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="auto" data-motion="system">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A11y Academy — learn web accessibility by doing</title>
+  <meta name="description" content="An interactive, offline-friendly course in web accessibility: all 86 WCAG 2.2 criteria, 28 topic hubs, live Broken vs Fixed demos, quizzes and games.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234338ca'/%3E%3Ctext x='16' y='22' font-size='17' text-anchor='middle' fill='white' font-family='Arial' font-weight='700'%3Ea11y%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <a class="skip-link" href="#sidebar-nav">Skip to roadmap</a>
+
+  <!-- Live regions live outside re-rendered content so announcements are reliable -->
+  <div id="live-polite" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+  <div id="live-assertive" class="sr-only" role="alert" aria-live="assertive" aria-atomic="true"></div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="#/" aria-label="A11y Academy, home">
+        <span class="brand-mark" aria-hidden="true">a11y</span>
+        <span class="brand-name">Academy</span>
+      </a>
+      <nav class="primary-nav" aria-label="Primary">
+        <ul>
+          <li><a href="#/" data-nav="home">Home</a></li>
+          <li><a href="#/learn" data-nav="learn">Learn</a></li>
+          <li><a href="#/criteria" data-nav="criteria">WCAG Explorer</a></li>
+          <li><a href="#/dashboard" data-nav="dashboard">Progress</a></li>
+          <li><a href="#/labs" data-nav="labs">Labs</a></li>
+          <li class="nav-extra"><a href="#/resources" data-nav="resources">Resources</a></li>
+          <li class="nav-extra"><a href="#/glossary" data-nav="glossary">Glossary</a></li>
+        </ul>
+      </nav>
+      <div class="header-tools">
+        <span class="chip chip-xp" id="hdr-xp" title="Experience points"><span aria-hidden="true">⚡</span> <span id="hdr-xp-num">0</span><span class="xp-word"> XP</span></span>
+        <button type="button" class="btn btn-ghost" id="open-palette" aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K">
+          <span aria-hidden="true">🔎</span> <span class="hide-sm">Search</span> <kbd class="hide-sm" aria-hidden="true">Ctrl K</kbd>
+        </button>
+        <button type="button" class="btn btn-ghost" id="open-prefs" aria-haspopup="dialog">
+          <span aria-hidden="true">🎛️</span> <span class="hide-sm">Display</span><span class="sr-only"> settings</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" aria-label="Course roadmap">
+      <nav id="sidebar-nav" aria-label="Roadmap" tabindex="-1"></nav>
+    </aside>
+    <main id="main" tabindex="-1"></main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p>A11y Academy · Built to WCAG 2.2 AA · Works offline · Progress is saved in this browser only.</p>
+      <nav aria-label="Footer">
+        <ul>
+          <li><a href="#/roadmap">Build roadmap</a></li>
+          <li><a href="#/guide">How to add lessons</a></li>
+          <li><a href="#/certificate">Progress summary</a></li>
+          <li><a href="#/accessibility-statement">Accessibility statement</a></li>
+          <li><a href="https://www.w3.org/WAI/WCAG22/quickref/" rel="noopener">WCAG 2.2 Quick Reference<span class="sr-only"> (external site)</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </footer>
+
+  <nav class="bottom-nav" aria-label="Mobile">
+    <ul>
+      <li><a href="#/" data-nav="home"><span aria-hidden="true">🏠</span><span>Home</span></a></li>
+      <li><a href="#/learn" data-nav="learn"><span aria-hidden="true">📚</span><span>Learn</span></a></li>
+      <li><a href="#/criteria" data-nav="criteria"><span aria-hidden="true">✅</span><span>WCAG</span></a></li>
+      <li><a href="#/dashboard" data-nav="dashboard"><span aria-hidden="true">📈</span><span>Progress</span></a></li>
+      <li><button type="button" id="open-palette-mobile"><span aria-hidden="true">🔎</span><span>Search</span></button></li>
+    </ul>
+  </nav>
+
+  <div id="toast-region" class="toast-region" role="region" aria-label="Notifications"></div>
+
+  <!-- Command palette (native <dialog>: focus containment + Esc come for free) -->
+  <dialog id="palette" class="dialog palette" aria-labelledby="palette-title">
+    <h2 id="palette-title" class="sr-only">Search lessons, criteria, topics and glossary</h2>
+    <div class="palette-input">
+      <label for="palette-q" class="sr-only">Search</label>
+      <input id="palette-q" type="text" role="combobox" aria-expanded="true" aria-controls="palette-list"
+             aria-autocomplete="list" aria-activedescendant="" placeholder="Search lessons, criteria (e.g. 2.5.7), topics, glossary…"
+             autocomplete="off" spellcheck="false">
+      <button type="button" class="btn btn-ghost" id="palette-close">Close<span class="sr-only"> search</span></button>
+    </div>
+    <p id="palette-hint" class="muted small">Use ↑ ↓ to move, Enter to open, Esc to close.</p>
+    <ul id="palette-list" role="listbox" aria-label="Results"></ul>
+  </dialog>
+
+  <!-- Display preferences -->
+  <dialog id="prefs" class="dialog" aria-labelledby="prefs-title">
+    <form method="dialog" id="prefs-form">
+      <div class="dialog-head">
+        <h2 id="prefs-title">Display settings</h2>
+        <button class="btn btn-ghost" value="close" aria-label="Close display settings">✕</button>
+      </div>
+      <fieldset>
+        <legend>Theme</legend>
+        <div class="choice-row" id="pref-theme">
+          <label><input type="radio" name="theme" value="auto"> Match my device</label>
+          <label><input type="radio" name="theme" value="light"> Light</label>
+          <label><input type="radio" name="theme" value="dark"> Dark</label>
+          <label><input type="radio" name="theme" value="contrast"> High contrast</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Text size</legend>
+        <div class="choice-row" id="pref-font">
+          <label><input type="radio" name="font" value="100"> Default</label>
+          <label><input type="radio" name="font" value="115"> Large</label>
+          <label><input type="radio" name="font" value="130"> Larger</label>
+          <label><input type="radio" name="font" value="150"> Largest</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Line spacing</legend>
+        <div class="choice-row" id="pref-spacing">
+          <label><input type="radio" name="spacing" value="normal"> Normal</label>
+          <label><input type="radio" name="spacing" value="relaxed"> Relaxed</label>
+          <label><input type="radio" name="spacing" value="loose"> Loose</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Reading &amp; motion</legend>
+        <div class="choice-col">
+          <label><input type="checkbox" name="dyslexia"> Dyslexia-friendly font <span class="muted small">(uses OpenDyslexic, Lexend or Atkinson if installed; otherwise a wide, open sans-serif)</span></label>
+          <label><input type="checkbox" name="motion"> Reduce motion <span class="muted small">(also follows your device setting automatically)</span></label>
+        </div>
+      </fieldset>
+      <div class="dialog-foot">
+        <button type="button" class="btn btn-ghost" id="prefs-reset">Reset display settings</button>
+        <button class="btn btn-primary" value="done">Done</button>
+      </div>
+    </form>
+  </dialog>
+
+  <noscript>
+    <div class="noscript"><p>A11y Academy needs JavaScript to run its lessons and save progress. Please enable JavaScript and reload.</p></div>
+  </noscript>
+
+  <!-- Classic scripts (not ES modules) so the site opens straight from disk with no server. -->
+  <script src="js/data/levels.js"></script>
+  <script src="js/data/criteria.js"></script>
+  <script src="js/data/topics.js"></script>
+  <script src="js/data/lessons.js"></script>
+  <script src="js/data/criteria-content.js"></script>
+  <script src="js/data/criteria-p1.js"></script>
+  <script src="js/data/criteria-p2.js"></script>
+  <script src="js/data/criteria-p3.js"></script>
+  <script src="js/data/lessons-p2.js"></script>
+  <script src="js/data/lessons-p3.js"></script>
+  <script src="js/data/lessons-p4.js"></script>
+  <script src="js/data/lessons-p5.js"></script>
+  <script src="js/data/lessons-p6.js"></script>
+  <script src="js/data/lessons-p6b.js"></script>
+  <script src="js/data/hubs.js"></script>
+  <script src="js/data/hubs-p3.js"></script>
+  <script src="js/data/components.js"></script>
+  <script src="js/data/hubs-p4.js"></script>
+  <script src="js/data/hubs-p5.js"></script>
+  <script src="js/data/hubs-p6.js"></script>
+  <script src="js/data/quizzes.js"></script>
+  <script src="js/data/glossary.js"></script>
+  <script src="js/data/glossary-p6.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/views.js"></script>
+  <script src="js/views-labs.js"></script>
+  <script src="js/views-labs2.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
